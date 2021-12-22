@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc -p .",
     "start": "node ./bin/main.js",
-    "example": "cd example/sample && node ./index.js"
+    "example": "cd example/readme && node ./index.js"
   },
   "keywords": [],
   "author": "",
