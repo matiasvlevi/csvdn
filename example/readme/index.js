@@ -3,9 +3,9 @@ const fs = require('fs');
 
 let csv = new CSVDN('./sample.csv');
 
-csv.add('Age', {
-  mode: 'map'
-});
+// csv.add('Age', {
+//   mode: 'map'
+// });
 
 csv.add('Sex', {
   mode: 'bool'

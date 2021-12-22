@@ -77,10 +77,11 @@ export class CSVDN {
   public normhead: string[];
   public rules: any;
   public normAlgs: any;
+  public nonValid: string[];
 
   constructor(path: string) {
     let csvdoc: any = CSVDN.read(path);
-
+    this.nonValid = [];
     this.content = csvdoc.content;
     this.head = csvdoc.head;
     this.normhead = this.head;
@@ -157,7 +158,7 @@ export class CSVDN {
     let csv_: any[][] = opt.normalized ? this.data : this.content;
     let csv: any[][] = csv_;
     if (opt.header) {
-      csv = CSVDN.toString([this.head].concat(csv_));
+      csv = CSVDN.toString([opt.normalized ? this.normhead : this.content].concat(csv_));
     }
     let spaces = Logger.findLargestString(csv);
     for (let i = 0; i < csv.length; i++) {
@@ -266,12 +267,12 @@ export class CSVDN {
   public normalize() {
     let streams: number[][] = [];
     let valid: any = this.isValid();
-    let nonValid: string[] = valid?.nonValid;
+    this.nonValid = valid?.nonValid;
 
-    let data: number[][] = new Array(this.content.length).fill(new Array(this.head.length - nonValid.length).fill(0));
+    let data: number[][] = new Array(this.content.length).fill(new Array(this.head.length - this.nonValid.length).fill(0));
     this.data = data;
     for (let h = 0; h < this.head.length; h++) {
-      if (!nonValid.includes(this.head[h])) {
+      if (!this.nonValid.includes(this.head[h])) {
         let rule: any = this.rules[this.head[h]];
 
         let datastream: number[];

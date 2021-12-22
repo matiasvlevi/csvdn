@@ -91,6 +91,7 @@ var DefaultNormalizationAlgs = {
 var CSVDN = /** @class */ (function () {
     function CSVDN(path) {
         var csvdoc = CSVDN.read(path);
+        this.nonValid = [];
         this.content = csvdoc.content;
         this.head = csvdoc.head;
         this.normhead = this.head;
@@ -161,7 +162,7 @@ var CSVDN = /** @class */ (function () {
         var csv_ = opt.normalized ? this.data : this.content;
         var csv = csv_;
         if (opt.header) {
-            csv = CSVDN.toString([this.head].concat(csv_));
+            csv = CSVDN.toString([opt.normalized ? this.normhead : this.content].concat(csv_));
         }
         var spaces = logger_1.Logger.findLargestString(csv);
         for (var i = 0; i < csv.length; i++) {
@@ -263,11 +264,11 @@ var CSVDN = /** @class */ (function () {
     CSVDN.prototype.normalize = function () {
         var streams = [];
         var valid = this.isValid();
-        var nonValid = valid === null || valid === void 0 ? void 0 : valid.nonValid;
-        var data = new Array(this.content.length).fill(new Array(this.head.length - nonValid.length).fill(0));
+        this.nonValid = valid === null || valid === void 0 ? void 0 : valid.nonValid;
+        var data = new Array(this.content.length).fill(new Array(this.head.length - this.nonValid.length).fill(0));
         this.data = data;
         for (var h = 0; h < this.head.length; h++) {
-            if (!nonValid.includes(this.head[h])) {
+            if (!this.nonValid.includes(this.head[h])) {
                 var rule = this.rules[this.head[h]];
                 var datastream = void 0;
                 if (Object.keys(this.normAlgs).includes(rule.mode)) {
