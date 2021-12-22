@@ -17,10 +17,15 @@ Age,Sex,Heartrate
 
 For data to be used in a machine learning context, we need to normalize it.
 
+Create a csv normalizer instance with your csv file path
+
 ```js
-
 let csv = new CSVDN('./path/to/your/file.csv');
+```
 
+Specify the column names of your data and their normalization operation. If a column is not specified here, it will not be included in the output file.
+
+```js
 csv.add('Age',{
   mode:'map'
 });
@@ -32,9 +37,17 @@ csv.add('Sex',{
 csv.add('Heartrate',{
   mode:'map'
 })
+```
 
+Call the `normalize` method
+
+```js
 csv.normalize();
+```
 
+Save the normalized CSV
+
+```js
 let file = csv.getFile();
 fs.writeFileSync('./your/write/path/file2.csv', file, 'utf8');
 ```
