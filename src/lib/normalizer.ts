@@ -103,6 +103,11 @@ export class CSVDN {
     }
     return stream;
   }
+  public static customOperations: any = {};
+  public static registerOperation(name: string, operation: any) {
+    CSVDN.customOperations[name] = operation;
+    console.log(CSVDN.customOperations);
+  }
   public checkIfLabel(h: number): boolean {
     let isLabel: boolean = false;
     for (let i = 0; i < this.content.length; i++) {
@@ -158,7 +163,7 @@ export class CSVDN {
     let csv_: any[][] = opt.normalized ? this.data : this.content;
     let csv: any[][] = csv_;
     if (opt.header) {
-      csv = CSVDN.toString([opt.normalized ? this.normhead : this.content].concat(csv_));
+      csv = CSVDN.toString([opt.normalized ? this.normhead : this.head].concat(csv_));
     }
     let spaces = Logger.findLargestString(csv);
     for (let i = 0; i < csv.length; i++) {
@@ -279,6 +284,9 @@ export class CSVDN {
         if (Object.keys(this.normAlgs).includes(rule.mode)) {
           let func = this.normAlgs[rule.mode];
           datastream = func(this, h);
+        } else if (Object.keys(CSVDN.customOperations).includes(rule.mode)) {
+          let func = CSVDN.customOperations[rule.mode];
+          datastream = func(this, h);
         } else {
           datastream = new Array(this.content.length).fill(NaN);
           Logger.error(`Mode ${rule.mode} is not a valid normalization operation`);
@@ -314,3 +322,5 @@ export class CSVDN {
     }
   }
 }
+
+

@@ -22,6 +22,10 @@ csv.normalize();
 
 csv.log({ normalized: true });
 
-let file = csv.getFile();
-console.log(file)
-fs.writeFileSync('./sample_norm.csv', file, 'utf8');
+
+CSVDN.registerOperation('myOp', (x) => (x * 2));
+
+
+// let file = csv.getFile();
+// console.log(file)
+// fs.writeFileSync('./sample_norm.csv', file, 'utf8');

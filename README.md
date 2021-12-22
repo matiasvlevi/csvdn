@@ -1,6 +1,6 @@
 # CSVDN
 
-CSVDN helps with normalizing data from csv files.
+CSVDN normalizes data from csv files.
 
 
 ### Install
