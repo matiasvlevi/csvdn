@@ -64,6 +64,9 @@ Age,Sex,Heartrate
 0.4666666666666667,1,0.9696969696969697
 ```
 
+<br/>
+
+### Log
 
 You can also use some utilities to log the file in the console:
 
