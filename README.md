@@ -2,6 +2,21 @@
 
 CSVDN helps with normalizing data from csv files.
 
+
+### Install
+
+```sh
+npm i csvdn
+```
+
+### Import
+
+```js
+const { CSVDN } = require('csvdn');
+```
+
+<br/>
+
 ### Example
 
 Here is a csv file with sample data
