@@ -4,6 +4,7 @@
   "description": "",
   "main": "./bin/main.js",
   "scripts": {
+    "setup": "mkdir bin && npm ci ",
     "build": "tsc -p .",
     "start": "node ./bin/main.js",
     "example": "cd example/readme && node ./index.js"
