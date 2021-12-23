@@ -1,72 +1,10 @@
 import * as fs from 'fs';
 import { Logger } from './logger';
-import { Utils } from './utils'
+import { Utils } from './utils';
+import { Default } from './defaults';
 
-const csvExportDefaults: any = {
-  tab: false,
-  header: true,
-  align: 'right',
-  normalized: true,
-  join: ',',
-  color: false
-}
-
-const logDefaults: any = {
-  tab: true,
-  header: true,
-  align: 'right',
-  normalized: false,
-  join: '',
-  color: true
-}
-
-const DefaultNormalizationAlgs: any = {
-  map: function map(doc: CSVDN, col: number): number[] {
-    let labels: string[] = [];
-    if (doc.checkIfLabel(col)) {
-      labels = doc.rules[doc.head[col]].labels;
-    }
-    let stream: number[] = [];
-    for (let i = 0; i < doc.content.length; i++) {
-      let value: number = 0;
-      if (labels.length > 0) {
-        value = labels.indexOf(doc.content[i][col]);
-      } else {
-        value = Number(doc.content[i][col]);
-      }
-      if (value !== -1) {
-        stream.push(value);
-      } else {
-        let foundLabels = doc.countLabels(col);
-        let errmsg = `This datastream has more labels than expected,`
-          + ` ${labels.length} were specified and got ${foundLabels.length} different labels\n`
-          + `specified: ( ${labels.join(' , ')} )\n`
-          + `found: ( ${foundLabels.join(' , ')} )\n`;
-        Logger.error(errmsg);
-      }
-    }
-    let record: number = Utils.findLargest(stream);
-    // Normalize
-    for (let i = 0; i < stream.length; i++) {
-      stream[i] = stream[i] / record;
-    }
-    return stream;
-  },
-  bool: function bool(doc: CSVDN, col: number): number[] {
-    let labels = doc.findLabels(col, 2);
-    let stream: number[] = [];
-    for (let i = 0; i < doc.content.length; i++) {
-
-      let value: number = labels.indexOf(doc.content[i][col]);
-      if (value !== -1) {
-        stream.push(value);
-      } else {
-        Logger.error('This datastream is not boolean');
-      }
-
-    }
-    return stream;
-  }
+type OperationT = {
+  [key: string]: (doc: CSVDN, col: number) => any;
 }
 
 export class CSVDN {
@@ -76,9 +14,9 @@ export class CSVDN {
   public head: string[];
   public normhead: string[];
   public rules: any;
-  public normAlgs: any;
   public nonValid: string[];
-
+  public max_: number[];
+  public min_: number[];
   constructor(path: string) {
     let csvdoc: any = CSVDN.read(path);
     this.nonValid = [];
@@ -86,9 +24,16 @@ export class CSVDN {
     this.head = csvdoc.head;
     this.normhead = this.head;
     this.data = csvdoc.data;
+    this.max_ = [];
+    this.min_ = [];
 
     this.rules = {};
-    this.normAlgs = DefaultNormalizationAlgs;
+  }
+  public static utils: any = Utils;
+  public static operations: OperationT = {};
+  public static customOperations: any = {};
+  public static registerOperation(name: string, operation: any) {
+    CSVDN.customOperations[name] = operation;
   }
   public add(key: string, opts: any) {
     this.rules[key] = opts;
@@ -103,11 +48,7 @@ export class CSVDN {
     }
     return stream;
   }
-  public static customOperations: any = {};
-  public static registerOperation(name: string, operation: any) {
-    CSVDN.customOperations[name] = operation;
-    console.log(CSVDN.customOperations);
-  }
+
   public checkIfLabel(h: number): boolean {
     let isLabel: boolean = false;
     for (let i = 0; i < this.content.length; i++) {
@@ -131,10 +72,45 @@ export class CSVDN {
     return csv;
 
   }
-  public log(options: any = logDefaults): string {
+  public static toNum(csv_: any[][]): number[][] {
+
+    let csv: number[][] = [];
+    for (let i = 0; i < csv_.length; i++) {
+      let stream: number[] = [];
+      for (let j = 0; j < csv_[i].length; j++) {
+        stream.push(+csv_[i][j]);
+      }
+      csv.push(stream);
+    }
+    return csv;
+
+  }
+  public initMax(): number[] {
+    let max = [];
+    for (let i = 0; i < this.normhead.length; i++) {
+      let column = this.getColumn(i);
+      max.push(Utils.findLargest(column))
+    }
+    return max;
+  }
+  public initMin(): number[] {
+    let min = [];
+    for (let i = 0; i < this.normhead.length; i++) {
+      let column = this.getColumn(i);
+      min.push(Utils.findSmallest(column));
+    }
+    return min;
+  }
+  public max(col: number) {
+    return this.max_[col];
+  }
+  public min(col: number) {
+    return this.min_[col]
+  }
+  public log(options: any = Default.log): string {
     // Inherit default options for unspecified options
     let opt: any = {};
-    opt = Object.assign(opt, logDefaults);
+    opt = Object.assign(opt, Default.log);
     for (let c in opt) {
       if (options[c] !== undefined) {
         opt[c] = options[c]
@@ -150,7 +126,7 @@ export class CSVDN {
 
     // Inherit default options for unspecified options
     let opt: any = {};
-    opt = Object.assign(opt, csvExportDefaults);
+    opt = Object.assign(opt, Default.csvExport);
     if (options !== undefined) {
       for (let c in opt) {
         if (options[c] !== undefined) {
@@ -161,7 +137,7 @@ export class CSVDN {
 
 
     let csv_: any[][] = opt.normalized ? this.data : this.content;
-    let csv: any[][] = csv_;
+    let csv: string[][] = csv_;
     if (opt.header) {
       csv = CSVDN.toString([opt.normalized ? this.normhead : this.head].concat(csv_));
     }
@@ -215,15 +191,6 @@ export class CSVDN {
       nonValid
     };
   }
-  private map(
-    v: number,
-    a: number,
-    b: number,
-    c: number,
-    d: number
-  ) {
-    return ((v - a) / (b - a)) * (d - c) + c;
-  }
   public countLabels(col: number): string[] {
     let cases: string[] = [];
     for (let i = 0; i < this.content.length; i++) {
@@ -267,7 +234,6 @@ export class CSVDN {
       }
       this.data = data;
     }
-
   }
   public normalize() {
     let streams: number[][] = [];
@@ -276,36 +242,91 @@ export class CSVDN {
 
     let data: number[][] = new Array(this.content.length).fill(new Array(this.head.length - this.nonValid.length).fill(0));
     this.data = data;
+
+    this.max_ = this.initMax();
+    this.min_ = this.initMin();
     for (let h = 0; h < this.head.length; h++) {
+      let addAsCol = true;
+      let csvInclude: number[][] = [];
       if (!this.nonValid.includes(this.head[h])) {
         let rule: any = this.rules[this.head[h]];
 
-        let datastream: number[];
-        if (Object.keys(this.normAlgs).includes(rule.mode)) {
-          let func = this.normAlgs[rule.mode];
+        let datastream: any[];
+        if (Object.keys(CSVDN.operations).includes(rule.mode)) {
+          let func: (doc: CSVDN, col: number) => any = CSVDN.operations[rule.mode];
+
           datastream = func(this, h);
+          if (!(typeof datastream[0] === 'number')) {
+            addAsCol = false;
+          }
+
         } else if (Object.keys(CSVDN.customOperations).includes(rule.mode)) {
           let func = CSVDN.customOperations[rule.mode];
-          datastream = func(this, h);
+          rule['max'] = this.max(h);
+          rule['min'] = this.min(h);
+          datastream = func(this.getColumn(h), rule);
+
         } else {
           datastream = new Array(this.content.length).fill(NaN);
           Logger.error(`Mode ${rule.mode} is not a valid normalization operation`);
-        }
-        streams.push(datastream);
 
+        }
+        if (!addAsCol) {
+          csvInclude = (datastream);
+        } else {
+          streams.push(datastream);
+        }
+
+      }
+      if (!addAsCol) {
+        let nstream: any = streams.concat(CSVDN.transpose(csvInclude));
+        streams = nstream;
       }
     }
     this.applyCSV(streams);
+  }
+  public static transpose(matrix: number[][]) {
+    let ans: number[][] = [];
+    for (let i = 0; i < matrix[i].length; i++) {
+      ans[i] = [];
+      for (let j = 0; j < matrix.length; j++) {
+        ans[i][j] = matrix[j][i]
+      }
+    }
+    return ans;
+  }
+  public static concatColumns(main: number[][], include: number[][]) {
+    for (let i = 0; i < main.length; i++) {
+      main[i].concat(include[i])
+    }
+    return main;
   }
   public getData(): number[][] {
     let data: number[][] = this.data;
     return data;
   }
+  public scanLabels(h: number) {
+    let found: string[] = [];
+    for (let i = 0; i < this.content.length; i++) {
+      let value = this.content[i][h];
+      if (!found.includes(value)) {
+        found.push(value);
+      }
+    }
+    return found;
+  }
+  public static removeWhiteSpace(label: string) {
+    return label.replace(/.*?( )?/gm, '');
+  }
   public static read(path: string) {
     // Read file & format into string jagged array
     let content = fs.readFileSync(path, 'utf8')
       .split('\r\n')
-      .map((x: string) => x.split(','));
+      .map((x: string) => x.split(',')
+        .map(z => {
+          return CSVDN.removeWhiteSpace(z);
+        })
+      );
 
     let head = content.splice(0, 1)[0];
     let s: number = head.length > 1 ? 1 : 0;

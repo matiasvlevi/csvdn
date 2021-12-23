@@ -21,6 +21,9 @@ csv.add('Height', {
 csv.add('Degree', {
   mode: 'bool'
 });
+csv.add('Origin', {
+  mode: 'binary'
+});
 
 csv.normalize();
 

@@ -7,7 +7,7 @@
     "setup": "mkdir bin && npm ci && tsc -p .",
     "build": "tsc -p .",
     "start": "node ./bin/main.js",
-    "example": "cd examples/readme && node ./index.js"
+    "example": "cd examples/sample && node ./index.js"
   },
   "keywords": [],
   "author": "",
