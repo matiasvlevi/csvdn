@@ -1,5 +1,5 @@
-import { CSVDN } from '../normalizer';
-import { Logger } from '../logger';
+import { CSVDN } from '../csvdn';
+
 export function binary(doc: CSVDN, col: number): any {
   let labels: string[] = [];
   if (doc.checkIfLabel(col)) {

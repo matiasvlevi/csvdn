@@ -1,4 +1,4 @@
-import { CSVDN } from './lib/normalizer';
+import { CSVDN } from './lib/csvdn';
 
 import { bool } from './lib/operations/bool';
 CSVDN.operations['bool'] = bool;
@@ -13,3 +13,4 @@ import { binary } from './lib/operations/binary';
 CSVDN.operations['binary'] = binary;
 
 export { CSVDN }
+

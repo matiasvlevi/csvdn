@@ -1,5 +1,6 @@
-import { CSVDN } from '../normalizer';
+import { CSVDN } from '../csvdn';
 import { Logger } from '../logger';
+
 export function map(doc: CSVDN, col: number): any {
   let labels: string[] = [];
   if (doc.checkIfLabel(col)) {

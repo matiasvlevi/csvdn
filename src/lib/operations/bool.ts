@@ -1,5 +1,6 @@
-import { CSVDN } from '../normalizer';
+import { CSVDN } from '../csvdn';
 import { Logger } from '../logger';
+
 export function bool(doc: CSVDN, col: number): any {
   let labels = doc.findLabels(col, 2);
   let stream: number[] = [];

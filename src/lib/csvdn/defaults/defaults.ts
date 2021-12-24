@@ -1,6 +1,6 @@
 
-class Default {
-  constructor() { }
+export class Default {
+  constructor() {/* No instance */ }
   public static csvExport: any = {
     tab: false,
     header: true,
@@ -18,5 +18,3 @@ class Default {
     color: true
   }
 }
-
-export { Default }

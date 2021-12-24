@@ -1,0 +1,25 @@
+export { add } from './methods/add';
+export { applyCSV } from './methods/applyCSV';
+export { checkIfLabel } from './methods/checkIfLabel';
+export { concatColumns } from './methods/concatColumns';
+export { countLabels } from './methods/countLabels';
+export { findLabels } from './methods/findLabels';
+export { getColumn } from './methods/getColumn';
+export { getData } from './methods/getData';
+export { getFile } from './methods/getFile';
+export { initMax } from './methods/initMax';
+export { initMin } from './methods/initMin';
+export { isValid } from './methods/isValid';
+export { log } from './methods/log';
+export { max } from './methods/max';
+export { min } from './methods/min';
+export { normalize } from './methods/normalize';
+export { read } from './methods/read';
+export { registerOperation } from './methods/registerOperation';
+export { removeWhiteSpace } from './methods/removeWhiteSpace';
+export { scanLabels } from './methods/scanLabels';
+export { setRules } from './methods/setRules';
+export { toNum } from './methods/toNum';
+export { toString } from './methods/toString';
+export { transpose } from './methods/transpose';
+
