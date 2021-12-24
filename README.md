@@ -143,7 +143,7 @@ Properties added can be found in the config object.
 ```js
 CSVDN.registerOperation('myOperation', (values, config) => {
   // `config` also includes specified properties, try:
-  // console.log(config.foo, console.bar)
+  // console.log(config.foo, config.bar)
 });
 
 ```
@@ -155,4 +155,4 @@ csv.add('MyColumn',{
 });
 ```
 
-
+We can use the properties `foo` and `bar` supplied by `config`
