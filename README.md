@@ -101,14 +101,14 @@ You can specify other options:
 
 <br/>
 
-## get the file as string
+## get the file as a string
 
 ```js
 let rawfile = csv.getFile();
 let normfile = csv.getFile({ normalized:true });
 ```
 
-This method acts exactly as `log`, but returns a string of the supposed log. The same options apply for getFile, altough the default config is opimal for csv's.
+This method acts exactly as `log`, but returns a string of the supposed log. The same options apply for `getFile`, altough the default config is opimal for writing csv's.
 
 <br/>
 
