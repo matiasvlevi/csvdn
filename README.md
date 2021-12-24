@@ -80,16 +80,16 @@ Age,Sex,Heartrate
 
 ## Log
 
-You can also use some utilities to log the file in the console:
+You can use the log method in order to print the file
 
 ```js
 csv.log();
 csv.log({ normalized: true });
 ```
 
-You can also specify some log options: 
+You can specify other options: 
 
-| Property   | type   | description                                |
+| Property   | Type   | Description                                |
 |------------|--------|--------------------------------------------|
 | normalized | bool   | log normalized data if true                |
 | join       | string | character with which to join columns       |
@@ -98,6 +98,17 @@ You can also specify some log options:
 | align      | string | Align text either `'left'`, `'right'`      |
 | color      | bool   | whether or not to include color in the log |
 
+
+<br/>
+
+## get the file as string
+
+```js
+let rawfile = csv.getFile();
+let normfile = csv.getFile({ normalized:true });
+```
+
+This method acts exactly as `log`, but returns a string of the supposed log. The same options apply for getFile, altough the default config is opimal for csv's.
 
 <br/>
 
