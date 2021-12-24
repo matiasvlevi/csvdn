@@ -1,15 +1,14 @@
 # CSVDN
 
-CSVDN normalizes data from csv files.
+CSVDN normalizes column data from csv files.
 
-
-### Install
+## Install
 
 ```sh
 npm i csvdn
 ```
 
-### Import
+## Import
 
 ```js
 const { CSVDN } = require('csvdn');
@@ -17,7 +16,7 @@ const { CSVDN } = require('csvdn');
 
 <br/>
 
-### Example
+## Example
 
 Here is a csv file with sample data
 ```csv
@@ -29,8 +28,6 @@ Age,Sex,Heartrate
 34, F, 94
 21, F, 96
 ```
-
-For data to be used in a machine learning context, we need to normalize it.
 
 Create a csv normalizer instance with your csv file path
 
@@ -81,20 +78,71 @@ Age,Sex,Heartrate
 
 <br/>
 
-### Log
+## Log
 
 You can also use some utilities to log the file in the console:
 
 ```js
 csv.log();
+csv.log({ normalized: true });
 ```
 
 You can also specify some log options: 
 
+| Property   | type   | description                                |
+|------------|--------|--------------------------------------------|
+| normalized | bool   | log normalized data if true                |
+| join       | string | character with which to join columns       |
+| header     | bool   | include the header                         |
+| tab        | bool   | include tabulation                         |
+| align      | string | Align text either `'left'`, `'right'`      |
+| color      | bool   | whether or not to include color in the log |
+
+
+<br/>
+
+## Register Operation
+If you want to normalize a column with some an other operation than the ones provided as default, you can register your own operation.
+
+Specify a name, and an operation function.
+The operation function is fed 2 arguments, a list of the values in the column, a config object containing usefull properties.
 ```js
-csv.log({ normalized: true });
-csv.log({ align:'left' });
-csv.log({ tab:false });
-csv.log({ header: false });
-csv.log({ join:' | ' });
+CSVDN.registerOperation('myOperation', (values, config) => {
+  let ans = [];
+
+  // Divide by maximum value in the column.
+  for (let i = 0; i < values.length; i++) {
+    ans.push(values[i] / config.max);
+  }
+
+  return ans;
+});
 ```
+```js
+csv.add('MyColumn',{
+  mode:'myOperation'
+});
+```
+
+<br/>
+
+### Add config properties
+
+Properties added can be found in the config object.
+
+```js
+CSVDN.registerOperation('myOperation', (values, config) => {
+  // `config` also includes specified properties, try:
+  // console.log(config.foo, console.bar)
+});
+
+```
+```js
+csv.add('MyColumn',{
+  mode:'myOperation',
+  foo:'foo',
+  bar:'bar'
+});
+```
+
+
