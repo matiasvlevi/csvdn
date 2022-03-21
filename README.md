@@ -115,7 +115,7 @@ This method acts exactly as `log`, but returns a string of the supposed log. The
 If you want to normalize a column with some other operation than the ones provided as default, you can register your own operation.
 
 Specify a name, and an operation function.
-The operation function is fed 2 arguments, a list of the values in the column, a config object containing usefull properties. This function must also include a list of numeric normalized values.
+The operation function is fed 2 arguments, a list of the values in the column, a config object containing usefull properties. This function must also return a list of numeric normalized values.
 ```js
 CSVDN.registerOperation('myOperation', (values, config) => {
   let ans = [];
